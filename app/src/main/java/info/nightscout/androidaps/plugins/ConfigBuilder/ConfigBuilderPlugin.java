@@ -913,13 +913,13 @@ public class ConfigBuilderPlugin implements PluginBase, PumpInterface, Constrain
 
                 if (lastRun.request instanceof DetermineBasalResultMA) {
                     DetermineBasalResultMA result = (DetermineBasalResultMA) lastRun.request;
-                    deviceStatus.iob = result.iob.json();
+                    deviceStatus.iob = result.iob.deviceStatusJson();
                     deviceStatus.iob.put("time", DateUtil.toISOString(lastRun.lastAPSRun));
                 }
 
                 if (lastRun.request instanceof DetermineBasalResultAMA) {
                     DetermineBasalResultAMA result = (DetermineBasalResultAMA) lastRun.request;
-                    deviceStatus.iob = result.iob.json();
+                    deviceStatus.iob = result.iob.deviceStatusJson();
                     deviceStatus.iob.put("time", DateUtil.toISOString(lastRun.lastAPSRun));
                 }
 

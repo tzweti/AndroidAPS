@@ -35,7 +35,24 @@ public class IobTotal {
         this.time = time;
     }
 
-    public IobTotal plus(IobTotal other) {
+    public boolean isEqual(IobTotal other) {
+        boolean retval = true;
+        if (!iob.equals(other.iob)) retval = false;
+        if (!activity.equals(other.activity)) retval = false;
+        if (!bolussnooze.equals(other.bolussnooze)) retval = false;
+        if (!basaliob.equals(other.basaliob)) retval = false;
+        if (!netbasalinsulin.equals(other.netbasalinsulin)) retval = false;
+        if (!hightempinsulin.equals(other.hightempinsulin)) retval = false;
+        if (!netInsulin.equals(other.netInsulin)) retval = false;
+        if (!netRatio.equals(other.netRatio)) retval = false;
+
+        if (retval == false) {
+
+        }
+        return retval;
+    }
+
+   public IobTotal plus(IobTotal other) {
         iob += other.iob;
         activity += other.activity;
         bolussnooze += other.bolussnooze;
@@ -59,16 +76,17 @@ public class IobTotal {
     }
 
     public IobTotal round() {
-        this.iob = Round.roundTo(this.iob, 0.001);
-        this.activity = Round.roundTo(this.activity, 0.0001);
-        this.bolussnooze = Round.roundTo(this.bolussnooze, 0.0001);
-        this.basaliob = Round.roundTo(this.basaliob, 0.001);
-        this.netbasalinsulin = Round.roundTo(this.netbasalinsulin, 0.001);
-        this.hightempinsulin = Round.roundTo(this.hightempinsulin, 0.001);
-        return this;
+        IobTotal rounded = new IobTotal(this.time);
+        rounded.iob = Round.roundTo(this.iob, 0.001);
+        rounded.activity = Round.roundTo(this.activity, 0.0001);
+        rounded.bolussnooze = Round.roundTo(this.bolussnooze, 0.0001);
+        rounded.basaliob = Round.roundTo(this.basaliob, 0.001);
+        rounded.netbasalinsulin = Round.roundTo(this.netbasalinsulin, 0.001);
+        rounded.hightempinsulin = Round.roundTo(this.hightempinsulin, 0.001);
+        return rounded;
     }
 
-    public JSONObject json() {
+    public JSONObject deviceStatusJson() {
         JSONObject json = new JSONObject();
         try {
             json.put("iob", iob);
@@ -95,6 +113,22 @@ public class IobTotal {
         return json;
     }
 
+    public JSONObject json() {
+        JSONObject json = new JSONObject();
+        try {
+            json.put("iob", iob);
+            json.put("basaliob", basaliob);
+            json.put("bolussnooze", bolussnooze);
+            json.put("activity", activity);
+            json.put("netbasalinsulin", netbasalinsulin);
+            json.put("hightempinsulin", hightempinsulin);
+            json.put("time", DateUtil.toISOString(new Date(time)));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return json;
+    }
+
     public static IobTotal calulateFromTreatmentsAndTemps() {
         ConfigBuilderPlugin.getActiveTreatments().updateTotalIOB();
         IobTotal bolusIob = ConfigBuilderPlugin.getActiveTreatments().getLastCalculation().round();
@@ -114,7 +148,7 @@ public class IobTotal {
     public static IobTotal[] calculateIobArrayInDia() {
         NSProfile profile = ConfigBuilderPlugin.getActiveProfile().getProfile();
         // predict IOB out to DIA plus 30m
-        long time = new Date().getTime();
+        long time = DateUtil.floorToMinute(new Date().getTime());
         int len = (int) ((profile.getDia() *60 + 30) / 5);
         IobTotal[] array = new IobTotal[len];
         int pos = 0;

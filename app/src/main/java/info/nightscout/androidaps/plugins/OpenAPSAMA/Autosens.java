@@ -13,6 +13,7 @@ import info.nightscout.androidaps.MainApp;
 import info.nightscout.androidaps.data.IobTotal;
 import info.nightscout.androidaps.db.BgReading;
 import info.nightscout.client.data.NSProfile;
+import info.nightscout.utils.DateUtil;
 import info.nightscout.utils.Round;
 
 
@@ -78,8 +79,8 @@ public class Autosens {
 
         String pastSensitivity = "";
         for (int i = 0; i < bucketed_data.size() - 3; ++i) {
-            long bgTime = bucketed_data.get(i).timeIndex;
-            int secondsFromMidnight = NSProfile.secondsFromMidnight(new Date(bgTime));
+            long bgTime = DateUtil.floorToMinute(bucketed_data.get(i).timeIndex);
+            int secondsFromMidnight = NSProfile.secondsFromMidnight(bgTime);
 
             double sens = NSProfile.toMgdl(profile.getIsf(secondsFromMidnight), profile.getUnits());
 

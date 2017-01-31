@@ -52,8 +52,8 @@ public class TempBasal {
     public boolean isAbsolute = false; // true if if set as absolute value in U
 
 
-    public IobTotal iobCalc(Date time) {
-        IobTotal result = new IobTotal(time.getTime());
+    public IobTotal iobCalc(long time) {
+        IobTotal result = new IobTotal(time);
         NSProfile profile = MainApp.getConfigBuilder().getActiveProfile().getProfile();
 
         if (profile == null)
@@ -97,8 +97,8 @@ public class TempBasal {
                     Iob aIOB = tempBolusPart.iobCalc(time, profile.getDia());
                     result.basaliob += aIOB.iobContrib;
                     result.activity += aIOB.activityContrib;
-                    Double dia_ago = time.getTime() - profile.getDia() * 60 * 60 * 1000;
-                    if (date > dia_ago && date <= time.getTime()) {
+                    Double dia_ago = time - profile.getDia() * 60 * 60 * 1000;
+                    if (date > dia_ago && date <= time) {
                         result.netbasalinsulin += tempBolusPart.insulin;
                         if (tempBolusPart.insulin > 0) {
                             result.hightempinsulin += tempBolusPart.insulin;

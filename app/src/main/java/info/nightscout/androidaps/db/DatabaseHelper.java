@@ -233,9 +233,8 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 
     // TREATMENT HANDLING
 
-    public boolean isDataUnchanged(long time) {
-        if (time >= latestTreatmentChange) return true;
-        else return false;
+    public long latestTreatmentChange() {
+        return latestTreatmentChange;
     }
 
     public int update(Treatment treatment) {

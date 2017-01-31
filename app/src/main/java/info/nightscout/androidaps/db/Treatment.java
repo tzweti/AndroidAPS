@@ -57,7 +57,7 @@ public class Treatment implements DataPointWithLabelInterface {
         this.mealBolus = t.mealBolus;
     }
 
-    public Iob iobCalc(Date time, Double dia) {
+    public Iob iobCalc(long time, Double dia) {
         Iob result = new Iob();
 
         Double scaleFactor = 3.0 / dia;
@@ -66,7 +66,7 @@ public class Treatment implements DataPointWithLabelInterface {
 
         if (this.insulin != 0d) {
             Long bolusTime = this.created_at.getTime();
-            Double minAgo = scaleFactor * (time.getTime() - bolusTime) / 1000d / 60d;
+            Double minAgo = scaleFactor * (time - bolusTime) / 1000d / 60d;
 
             if (minAgo < peak) {
                 Double x1 = minAgo / 5d + 1;

@@ -17,6 +17,11 @@ public class Config {
     public static final boolean DANAR = true && BuildConfig.PUMPDRIVERS;
     public static final boolean DANARKOREAN = true && BuildConfig.PUMPDRIVERS;
 
+
+    // calculation caching
+    public static final boolean useResultCaching = true;
+    public static final boolean logResultCache = false;
+
     public static final boolean detailedLog = true;
     public static final boolean logFunctionCalls = true;
     public static final boolean logIncommingBG = true;

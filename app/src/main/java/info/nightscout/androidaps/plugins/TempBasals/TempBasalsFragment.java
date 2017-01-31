@@ -76,7 +76,7 @@ public class TempBasalsFragment extends Fragment implements FragmentBase {
                 holder.percent.setText(DecimalFormatter.to0Decimal(tempBasal.percent) + "%");
             }
             holder.realDuration.setText(DecimalFormatter.to0Decimal(tempBasal.getRealDuration()) + " min");
-            IobTotal iob = tempBasal.iobCalc(new Date());
+            IobTotal iob = tempBasal.iobCalc(new Date().getTime());
             holder.iob.setText(DecimalFormatter.to2Decimal(iob.basaliob) + " U");
             holder.netInsulin.setText(DecimalFormatter.to2Decimal(iob.netInsulin) + " U");
             holder.netRatio.setText(DecimalFormatter.to2Decimal(iob.netRatio) + " U/h");
@@ -85,7 +85,7 @@ public class TempBasalsFragment extends Fragment implements FragmentBase {
                 holder.dateLinearLayout.setBackgroundColor(MainApp.instance().getResources().getColor(R.color.colorInProgress));
             else if (tempBasal.timeEnd == null)
                 holder.dateLinearLayout.setBackgroundColor(MainApp.instance().getResources().getColor(R.color.colorNotEnded));
-            else if (tempBasal.iobCalc(new Date()).basaliob != 0)
+            else if (tempBasal.iobCalc(new Date().getTime()).basaliob != 0)
                 holder.dateLinearLayout.setBackgroundColor(MainApp.instance().getResources().getColor(R.color.colorAffectingIOB));
             else
                 holder.dateLinearLayout.setBackgroundColor(MainApp.instance().getResources().getColor(R.color.cardColorBackground));

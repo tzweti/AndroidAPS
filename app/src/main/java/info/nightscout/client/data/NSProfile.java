@@ -448,6 +448,18 @@ public class NSProfile {
         return (int) (passed / 1000);
     }
 
+    public static int secondsFromMidnight(long date) {
+        Calendar c = Calendar.getInstance();
+        long now = date;
+        c.setTimeInMillis(date);
+        c.set(Calendar.HOUR_OF_DAY, 0);
+        c.set(Calendar.MINUTE, 0);
+        c.set(Calendar.SECOND, 0);
+        c.set(Calendar.MILLISECOND, 0);
+        long passed = now - c.getTimeInMillis();
+        return (int) (passed / 1000);
+    }
+
     public static Double toMgdl(Double value, String units) {
         if (units.equals(Constants.MGDL)) return value;
         else return value * Constants.MMOLL_TO_MGDL;

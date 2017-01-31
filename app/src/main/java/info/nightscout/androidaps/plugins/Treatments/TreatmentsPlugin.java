@@ -1,19 +1,14 @@
 package info.nightscout.androidaps.plugins.Treatments;
 
-import com.j256.ormlite.dao.Dao;
-import com.j256.ormlite.stmt.PreparedQuery;
-import com.j256.ormlite.stmt.QueryBuilder;
-import com.j256.ormlite.stmt.Where;
 import com.squareup.otto.Subscribe;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import info.nightscout.androidaps.Config;
 import info.nightscout.androidaps.Constants;
 import info.nightscout.androidaps.MainApp;
 import info.nightscout.androidaps.R;
@@ -26,6 +21,8 @@ import info.nightscout.androidaps.interfaces.TreatmentsInterface;
 import info.nightscout.androidaps.data.IobTotal;
 import info.nightscout.androidaps.plugins.ConfigBuilder.ConfigBuilderPlugin;
 import info.nightscout.client.data.NSProfile;
+import info.nightscout.utils.DateUtil;
+import info.nightscout.utils.SimpleResultCache;
 
 /**
  * Created by mike on 05.08.2016.
@@ -40,6 +37,8 @@ public class TreatmentsPlugin implements PluginBase, TreatmentsInterface {
 
     private static boolean fragmentEnabled = true;
     private static boolean fragmentVisible = true;
+
+    SimpleResultCache<IobTotal> simpleResultCache = new SimpleResultCache<>();
 
     @Override
     public String getFragmentClass() {
@@ -121,6 +120,15 @@ public class TreatmentsPlugin implements PluginBase, TreatmentsInterface {
 
     @Override
     public IobTotal getCalculationToTime(long time) {
+        IobTotal cachedValue = null;
+        if (Config.useResultCaching) {
+            cachedValue = simpleResultCache.get(time, MainApp.getDbHelper().latestTreatmentChange());
+            if (cachedValue != null) {
+                if (Config.logResultCache)
+                    log.debug("Cache hit. time: " + time);
+                return cachedValue;
+            }
+        }
         IobTotal total = new IobTotal(time);
 
         if (MainApp.getConfigBuilder() == null || ConfigBuilderPlugin.getActiveProfile() == null) // app not initialized yet
@@ -131,24 +139,29 @@ public class TreatmentsPlugin implements PluginBase, TreatmentsInterface {
 
         Double dia = profile.getDia();
 
-        Date now = new Date(time);
         for (Integer pos = 0; pos < treatments.size(); pos++) {
             Treatment t = treatments.get(pos);
             if (t.created_at.getTime() > time) continue;
-            Iob tIOB = t.iobCalc(now, dia);
+            Iob tIOB = t.iobCalc(time, dia);
             total.iob += tIOB.iobContrib;
             total.activity += tIOB.activityContrib;
-            Iob bIOB = t.iobCalc(now, dia / Constants.BOLUSSNOOZE_DIA_ADVISOR);
+            Iob bIOB = t.iobCalc(time, dia / Constants.BOLUSSNOOZE_DIA_ADVISOR);
             total.bolussnooze += bIOB.iobContrib;
+        }
+        if (Config.useResultCaching) {
+            if (Config.logResultCache)
+                log.debug("Cache miss. time: " + time);
+            simpleResultCache.put(total, time, MainApp.getDbHelper().latestTreatmentChange());
         }
         return total;
     }
 
     @Override
     public void updateTotalIOB() {
-        IobTotal total = getCalculationToTime(new Date().getTime());
+        long time = DateUtil.floorToMinute(new Date().getTime());
+        IobTotal total = getCalculationToTime(time);
 
-        lastCalculationTimestamp = new Date().getTime();
+        lastCalculationTimestamp = time;
         lastCalculation = total;
     }
 

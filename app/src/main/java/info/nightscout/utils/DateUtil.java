@@ -111,4 +111,8 @@ public class DateUtil {
     public static String dateAndTimeString(long mills) {
         return dateString(mills) + " " + timeString(mills);
     }
+
+    public static long floorToMinute(long time) {
+        return time - time % 60000L;
+    }
 }
