@@ -1,0 +1,20 @@
+{
+  "name": "AndroidAPS",
+  "scripts": {
+  },
+  "env": {
+    "api_secret": "1234567891011",
+    "mongo": "mongodb://tzveti:pinotnoir9@ds054128.mongolab.com:54128/tzvetidb",
+    "mongo_collection": "entries"
+  },
+  "formation": {
+  },
+  "addons": [
+
+  ],
+  "buildpacks": [
+    {
+      "url": "heroku/nodejs"
+    }
+  ]
+}
